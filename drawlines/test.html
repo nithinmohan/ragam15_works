@@ -1,0 +1,120 @@
+<html>
+	<head>
+	<style>
+	.line{
+		position: absolute;
+	}
+	</style>
+	<script src="../lib/jquery.js"></script>
+	<script>
+	var drawline=function(start,type,length,time,callback_data){
+	  	var id ='c_'+new Date().getTime()
+      	var line = "<div id='"+id+"'class='line'>&nbsp;</div>";
+     	$('body').append(line);
+     	if(type==='horizontal'){
+			$('#'+id).css({
+			left: start.x+"px",
+			top: start.y+"px",
+			width: 0+"px",
+			height:"2px",
+			position:'absolute',
+			backgroundColor: "red"
+			});
+			var left=length<0?(start.x+length):start.x;
+			if(callback_data){
+				$('#'+id).animate({left:left+"px",width:Math.abs(length)+"px"},time*1000,"linear",function(){drawline({x:start.x+length,y:start.y},callback_data.type,callback_data.length,callback_data.time,callback_data.callback_data)});
+			}
+			else{
+				$('#'+id).animate({width:length+"px"},time*1000,"linear");
+			}
+
+      	}
+      	if(type==='vertical'){
+			$('#'+id).css({
+			left: start.x+"px",
+			top: start.y+"px",
+			height: 0+"px",
+			width:"2px",
+			position:'absolute',
+			backgroundColor: "red"
+			});
+			var top=length<0?(start.y+length):start.y;
+			if(callback_data){
+				$('#'+id).animate({top:top+"px",height:Math.abs(length)+"px"},time*1000,"linear",function(){drawline({x:start.x,y:start.y+length},callback_data.type,callback_data.length,callback_data.time,callback_data.callback_data)});
+			}
+			else{
+				$('#'+id).animate({height:length+"px"},time*1000,"linear");
+			}
+      	}
+    }
+      // var image_popup=function(image_url,)
+	var data={
+		start:{x:200,y:200},
+		details:[{
+			type:'horizontal',
+			length:40,
+			time:.5
+		},
+		{
+			type:'vertical',
+			length:-40,
+			time:.5
+		},
+		{
+			type:'horizontal',
+			length:-40,
+			time:.5
+		},
+		{
+			type:'vertical',
+			length:-40,
+			time:.5
+		},
+		{
+			type:'horizontal',
+			length:-40,
+			time:.5
+		},
+		{
+			type:'horizontal',
+			length:-40,
+			time:.5
+		},
+		{
+			type:'vertical',
+			length:-40,
+			time:.5
+		},
+		{
+			type:'horizontal',
+			length:-40,
+			time:.5
+		},
+		{
+			type:'horizontal',
+			length:-40,
+			time:1
+		},
+		{
+			type:'vertical',
+			length:40,
+			time:1
+		}]
+	}
+	var draw_animated_lines=function(data){
+		var details=data.details;
+		var build=details[0];
+		for(i=1;i<details.length;i++){
+			details[i-1].callback_data=details[i];
+		}
+		drawline(data.start,details[0].type,details[0].length,details[0].time,details[0].callback_data);
+	}
+	$(function(){
+		draw_animated_lines(data);
+		
+	})
+	</script>
+	</head>
+	<body>
+	</body>
+</html>
