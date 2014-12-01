@@ -7,28 +7,37 @@
 		margin: 0px;
 		padding: 0px;
 	}
+	#background{
+		position: fixed;
+		width:100%;
+		height:100%;
+		background-size:auto 100%;
+		background-repeat: no-repeat;
+		background-color:black;
+		background-position: center;
+		background-image: url("ragam_logo.jpg");
+	}
 	.panel{
 		width:100%;
+		height:100%;
+		opacity: 0.5
 	}
 	#panel1{
-		height:200%;
 		background-color: red;
 	}
 	#panel2{
-		height:100%;
 		background-color: blue;
 	}
 	#panel3{
-		height:200%;
 		background-color: black;
 	}
 	#panel4{
-		height:100%;
 		background-color: yellow;
 	}
 	</style>
 </head>
 <body>
+	<div id="background"></div>
 	<div class="panel" id="panel1"></div>
 	<div class="panel" id="panel2"></div>
 	<div class="panel" id="panel3"></div>
@@ -37,46 +46,43 @@
 <script src="../lib/jquery.js"></script>
 <script src="../lib/viewportchecker.js"></script>
 <script>
-var top_array=[];
-var elems=4;
-current_focus=0;
-var animation_state=false;
-var move_to_slide=function(slide){
-	animation_state=true;
-	current_focus=slide;
-	$("html, body").animate({scrollTop: top_array[current_focus]},function(){animation_state=false;});
-}
-var temp=0;
-$(window).resize(function(){
-	calculate_top_array();
-});
-var calculate_top_array=function(){
-	temp=0;
-	top_array=[];
-		$(".panel").each(function(){
-		top_array.push(temp);
-		temp+=$(this).height();
+	var top_array=[];
+	var elems=4;
+	current_focus=0;
+	var animation_state=false;
+	var move_to_slide=function(slide){
+		$("html, body").stop();
+		animation_state=true;
+		current_focus=slide;
+		$("html, body").animate({scrollTop: top_array[current_focus]},function(){animation_state=false;});
+	}
+	var temp=0;
+	$(window).resize(function(){
+		calculate_top_array();
+		move_to_slide(current_focus);
+	});
+	var calculate_top_array=function(){
+		temp=0;
+		top_array=[];
+			$(".panel").each(function(){
+			top_array.push(temp);
+			temp+=$(this).height();
+		})
+	}
+	$(document).bind('mousewheel DOMMouseScroll',function(event){
+		event.preventDefault();
+		event.stopPropagation();
+		if(animation_state==true)
+			return;
+	 	if (event.originalEvent.wheelDelta < 0) {
+			move_to_slide((current_focus+1)%elems)
+		}
+		else{
+			move_to_slide(((current_focus-1)+elems)%elems)
+		}
 	})
-}
-$(document).bind('mousewheel DOMMouseScroll',function(event){
-	event.preventDefault();
-	event.stopPropagation();
-	if(animation_state==true)
-		return;
- 	if (event.originalEvent.wheelDelta < 0) {
-		move_to_slide((current_focus+1)%elems)
-	}
-	else{
-		move_to_slide(((current_focus-1)+elems)%elems)
-	}
-	// var index=top_array.indexOf($('body').scrollTop())
-	// if(index!==-1){
-	// 	//alert("ASd");
-	// }
-})
-$(function(){
-	// 
-	calculate_top_array();
-})
+	$(function(){
+		calculate_top_array();
+	})
 </script>
 </html>
