@@ -1,0 +1,105 @@
+<html>
+<head>
+</head>
+<body>
+<canvas id="area"></canvas>
+</body>
+<script src='../lib/vector.js'></script>
+<script src='../lib/jquery.js'></script>
+<script>
+// requestAnim shim layer by Paul Irish
+	var mouse_point=new Vector(0,0);
+	var clicked=false;
+	$('body').mousemove(function(e){
+		mouse_point=new Vector(e.pageX,e.pageY);
+	})
+	$('body').mousedown(function(e){
+		clicked=true;
+	})
+	$('body').mouseup(function(e){
+		clicked=false;
+	})
+	var canvas=document.getElementById("area");
+	var ctx=canvas.getContext('2d');
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight;
+	$(window).resize(function(){
+		canvas.width = window.innerWidth;
+		canvas.height = window.innerHeight;
+	})
+    window.requestAnimFrame = (function(){
+      return  window.requestAnimationFrame       || 
+              window.webkitRequestAnimationFrame || 
+              window.mozRequestAnimationFrame    || 
+              window.oRequestAnimationFrame      || 
+              window.msRequestAnimationFrame     || 
+              function(/* function */ callback, /* DOMElement */ element){
+                window.setTimeout(callback, 1000 / 60);
+              };
+    })();
+
+	var Particle=function(position,velocity,acceleration){
+		this.position=position;
+		this.velocity=velocity;
+		this.acceleration=acceleration;
+	}
+	Particle.prototype.update=function(){
+		var attr;
+		if(clicked) attr=1;
+		else attr=-1;
+		this.velocity.add(this.acceleration);
+		var v=new Vector((this.position.x-mouse_point.x),(this.position.y-mouse_point.y));
+		this.velocity.add(v.divide_scalar(attr*v.magnitude()/1));
+		if(this.velocity.magnitude()>10){
+			this.velocity.normalize().multiply_scalar(10);
+		}
+		// console.log(this.position.getDistance(dir));
+		// this.velocity.add(Vector.fromAngle(10/(this.position.getDistance(dir)),4));
+		// this.velocity.add(Vector.fromAngle(.1,7));
+		this.position.add(this.velocity);
+	}
+	Particle.prototype.draw=function(){
+		ctx.fillStyle = "rgba(213,69,0, 0.5)";
+		ctx.fillRect(this.position.x,this.position.y,5,5);
+	}
+	Particle.prototype.remove_condition=function(){
+		return false;
+		return this.position.x<0||this.position.x>canvas.width||this.position.y<0||this.position.y>canvas.height;
+	}
+	var particles=[];
+	particles.update=function(){
+		for(i=particles.length-1;i>=0;i--){
+			particles[i].update();
+			if(particles[i].remove_condition()){
+				particles.splice(i,1);
+			}
+		}
+	}
+	particles.draw=function(){
+		for(i=particles.length-1;i>=0;i--){
+			particles[i].draw();
+		}
+	}
+	var clear=function(){
+		ctx.fillStyle = "rgb(0,0,0)";
+		ctx.fillRect (0,0,canvas.width,canvas.height);
+	}
+	var update=function(){
+		particles.update();
+	}
+	var draw=function(){
+		particles.draw();
+	}
+	var loop=function(){
+		var c=Math.random()*10>>0;
+		var k=Math.random()-.5;
+		var v=Math.random()-.5;
+		particles.push(new Particle(new Vector(canvas.width/2,canvas.height/2),new Vector(c*v/2,c*k/2),new Vector(c*k/10,c*v/10)));
+		clear();
+		update();
+		draw();
+		requestAnimationFrame(loop);
+	}
+	requestAnimationFrame(loop);
+</script>
+</html>
