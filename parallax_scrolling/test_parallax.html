@@ -48,13 +48,14 @@
 <script>
 	var top_array=[];
 	var elems=4;
+	var $html_body=$("html, body");
 	current_focus=0;
 	var animation_state=false;
 	var move_to_slide=function(slide){
-		$("html, body").stop();
+		$html_body.stop();
 		animation_state=true;
 		current_focus=slide;
-		$("html, body").animate({scrollTop: top_array[current_focus]},function(){animation_state=false;});
+		$html_body.animate({scrollTop: top_array[current_focus]},function(){animation_state=false;});
 	}
 	var temp=0;
 	$(window).resize(function(){
@@ -64,25 +65,33 @@
 	var calculate_top_array=function(){
 		temp=0;
 		top_array=[];
-			$(".panel").each(function(){
+		$(".panel").each(function(){
 			top_array.push(temp);
 			temp+=$(this).height();
 		})
 	}
-	$(document).bind('mousewheel DOMMouseScroll',function(event){
+	$(document).bind('mousewheel DOMMouseScroll keydown',function(event){
 		event.preventDefault();
 		event.stopPropagation();
 		if(animation_state==true)
 			return;
-	 	if (event.originalEvent.wheelDelta < 0) {
-			move_to_slide((current_focus+1)%elems)
+	 	if (event.originalEvent.wheelDelta < 0||event.which==34||event.which==39||event.which==40) {
+			move_to_slide((current_focus+1)%elems);
+			return false;
 		}
-		else{
-			move_to_slide(((current_focus-1)+elems)%elems)
+		else if (event.originalEvent.wheelDelta >= 0||event.which==33||event.which==37||event.which==38){
+			move_to_slide(((current_focus-1)+elems)%elems);
+			return false;
+		}
+		else if(event.which==36){
+			move_to_slide(0);
+			return false;
+		}
+		else if(event.which==35){
+			move_to_slide(elems-1);
+			return false;
 		}
 	})
-	$(function(){
-		calculate_top_array();
-	})
+	calculate_top_array();
 </script>
 </html>
