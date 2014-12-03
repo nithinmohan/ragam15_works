@@ -1,0 +1,93 @@
+<html>
+<head>
+	<style>
+	.gal{
+		position: absolute;
+		transform:scale(1);
+		transition:all .5s;
+		word-wrap: break-word;
+	}
+	</style>
+	<script src="../lib/jquery.js"></script>
+	<script>
+	var mkob=function(elem,i){
+		var left=elem.position().left;
+		var top=elem.position().top;
+		var width=elem.width();
+		var height=elem.height();
+		var that={
+			rand:function(){
+				newleft=Math.random()*400>>0;
+				newtop=Math.random()*200>>0;
+				opacity=Math.random();
+				scale=.25+Math.random()*.75;
+				newwidth=elem.width()*scale;
+				newheight=elem.height()*scale;
+				elem.css('z-index',-1);
+				elem.stop();
+				elem.css({'left':newleft+'px',
+							'top':newtop+'px',
+							'opacity':opacity/3+0.3,
+							'transform': 'scale('+scale+')'
+							//'-webkit-filter': 'grayscale(1)'
+							});
+			},
+			init:function(){
+				//elem.stop();
+				elem.stop();
+				elem.css('z-index',0);
+				elem.css({'transform':'scale(1)'});
+				elem.css({'left':left+'px',
+							'top':top+'px',
+							'opacity':1,
+							'transform': 'scale('+1+')'
+							});
+
+			},
+			ref:elem,
+			andi:i
+		}
+		return that;
+	}
+	var initob=function(){
+		var a=new Array();
+		var i=0;
+		$(".gal").each(function(){
+		a[i]=mkob($(this),i);
+		i++;
+	});
+	return a;
+	}
+	$(function(){
+		ob=initob();
+		$gal=$(".gal");
+		$gal.mouseover(function(){
+			var i=0;
+			var a=$(this);
+			$gal.each(function(){
+				if($(this).attr('id')!=a.attr('id'))
+					ob[i].rand();
+				i++;
+			});
+		});
+		$gal.mouseout(function(){
+			var i=0;
+			var a=this;
+			$gal.each(function(){
+					ob[i].init();
+					i++;
+			});
+		});
+});
+</script>
+</head>
+<body>
+<div id="box1" class='gal' style="left:10px;top:10px;width:100px;height:100px;background-color:red">asdasd</div>
+<div id="box2" class='gal' style="left:120px;top:10px;width:100px;height:100px;background-color:brown">sadasd</div>
+<div id="box3" class='gal' style="left:230px;top:10px;width:100px;height:100px;background-color:pink">sadasdasdasdsadasdasdadewweffsdfsfsdsdgfdg</div>
+<div id="box4" class='gal' style="left:10px;top:120px;width:100px;height:100px;background-color:yellow"></div>
+<div id="box5" class='gal' style="left:120px;top:120px;width:100px;height:100px;background-color:black"></div>
+<div id="box6" class='gal' style="left:230px;top:120px;width:100px;height:100px;background-color:green"></div>
+
+</body>
+</html>
