@@ -3,11 +3,13 @@
 </head>
 <body>
 <canvas id="area"></canvas>
+<audio id="myAudio" src="all_of_me.mp3"></audio>
 </body>
 <script src='../lib/vector.js'></script>
 <script src='../lib/jquery.js'></script>
 <script>
 // requestAnim shim layer by Paul Irish
+window.onload=function(){
 	var mouse_point=new Vector(0,0);
 	var clicked=false;
 	$('body').mousemove(function(e){
@@ -19,6 +21,16 @@
 	$('body').mouseup(function(e){
 		clicked=false;
 	})
+	var actx = new AudioContext();
+	 audio = document.getElementById('myAudio');
+	var audioSrc = actx.createMediaElementSource(audio);
+	var analyser = actx.createAnalyser();
+	// we have to connect the MediaElementSource with the analyser 
+	audioSrc.connect(analyser);
+	// we could configure the analyser: e.g. analyser.fftSize (for further infos read the spec)
+
+	// frequencyBinCount tells you how many values you'll receive from the analyser
+	var frequencyData = new Uint8Array(analyser.frequencyBinCount);
 	var canvas=document.getElementById("area");
 	var ctx=canvas.getContext('2d');
 	canvas.width = window.innerWidth;
@@ -43,6 +55,7 @@
 		this.velocity=velocity;
 		this.acceleration=acceleration;
 	}
+	Particle.prototype.speed_limit=10;
 	Particle.prototype.update=function(){
 		var attr;
 		if(clicked) attr=1;
@@ -50,8 +63,8 @@
 		this.velocity.add(this.acceleration);
 		var v=new Vector((this.position.x-mouse_point.x),(this.position.y-mouse_point.y));
 		this.velocity.add(v.divide_scalar(attr*v.magnitude()/1));
-		if(this.velocity.magnitude()>10){
-			this.velocity.normalize().multiply_scalar(10);
+		if(this.velocity.magnitude()>this.speed_limit){
+			this.velocity.normalize().multiply_scalar(this.speed_limit);
 		}
 		// console.log(this.position.getDistance(dir));
 		// this.velocity.add(Vector.fromAngle(10/(this.position.getDistance(dir)),4));
@@ -99,7 +112,10 @@
 		update();
 		draw();
 		requestAnimationFrame(loop);
+		analyser.getByteFrequencyData(frequencyData);
 	}
+	audio.start();
 	requestAnimationFrame(loop);
+}
 </script>
 </html>
